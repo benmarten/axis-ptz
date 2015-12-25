@@ -4,9 +4,12 @@ var express = require('express');
 var app = express();
 var http = require('http');
 
-var MOVE_WAIT = 3000;
-var CAMERA_IP = '192.168.178.54';
-var CAMERA_CREDENTIALS = 'root:shIt7Bu8';
+var MOVE_WAIT = process.env.MOVE_WAIT || 10000;
+var CAM_IP = '192.168.178.54';
+var CAM_CREDENTIALS = 'root:shIt7Bu8';
+var CAM_RES_W = 704;
+var CAM_RES_H = 576;
+var CAM_FACTOR = process.env.CAM_FACTOR || 10;
 
 var lastMotionTime;
 
@@ -16,8 +19,8 @@ var extractPosition = function(req) {
     return;
   }
   return {
-    x: req.query.x,
-    y: req.query.y
+    x: Math.round(-(CAM_RES_W / 2 - req.query.x) / CAM_FACTOR),
+    y: Math.round(-(CAM_RES_H / 2 - req.query.y) / CAM_FACTOR)
   };
 };
 
@@ -27,9 +30,10 @@ app.get('/', function(req, res) {
     lastMotionTime = now;
 
     var newPosition = extractPosition(req);
+    console.log('New position: ' + JSON.stringify(newPosition));
     if (newPosition) {
-      http.get('http://' + CAMERA_CREDENTIALS + '@' + CAMERA_IP +
-        '/axis-cgi/com/ptz.cgi?rpan=-10',
+      http.get('http://' + CAM_CREDENTIALS + '@' + CAM_IP +
+        '/axis-cgi/com/ptz.cgi?rpan=' + newPosition.x,
         function() {
           console.log('Camera moved.');
           return res.status(200).send('Camera moved.');
