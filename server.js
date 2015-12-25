@@ -14,6 +14,8 @@ var CAM_FACTOR_Y = process.env.CAM_FACTOR || 10;
 
 var lastMotionTime;
 
+console.log('MOVE_WAIT: ' + MOVE_WAIT);
+
 var extractPosition = function(req) {
   console.log('Query Params: ' + JSON.stringify(req.query));
   if (!req.query || !req.query.x || !req.query.y) {
