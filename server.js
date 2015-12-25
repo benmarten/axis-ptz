@@ -30,14 +30,18 @@ app.get('/', function(req, res) {
       http.get('http://' + CAMERA_CREDENTIALS + '@' + CAMERA_IP +
         '/axis-cgi/com/ptz.cgi?rpan=-10',
         function() {
+          console.log('Camera moved.');
           return res.status(200).send('Camera moved.');
         }).on('error', function(e) {
-        return console.log("Got error: " + e.message);
+        console.log("Got error: " + e.message);
+        return res.status(500);
       });
     } else {
+      console.log('New position missing.');
       return res.status(500).send('New position missing.');
     }
   } else {
+    console.log('Skipping request.');
     return res.status(200).send('Skipping request.');
   }
 });
