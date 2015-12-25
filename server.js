@@ -3,6 +3,7 @@
 var express = require('express');
 var app = express();
 var http = require('http');
+var Q = require('q');
 
 var MOVE_WAIT = parseInt(process.env.MOVE_WAIT) || 10000;
 var CAM_IP = '192.168.178.54';
@@ -11,10 +12,13 @@ var CAM_RES_W = 704;
 var CAM_RES_H = 576;
 var CAM_FACTOR_X = parseInt(process.env.CAM_FACTOR) || 10;
 var CAM_FACTOR_Y = parseInt(process.env.CAM_FACTOR) || 12;
+var CAM_START_POS = {
+  x: 50,
+  y: -30
+};
 
 var lastMotionTime;
-
-console.log('MOVE_WAIT: ' + MOVE_WAIT);
+var schedulePositionResetId;
 
 var extractPosition = function(req) {
   console.log('Query Params: ' + JSON.stringify(req.query));
@@ -27,6 +31,48 @@ var extractPosition = function(req) {
   };
 };
 
+var moveCameraRelative = function(newPosition) {
+  var deferred = Q.defer();
+  http.get('http://' + CAM_CREDENTIALS + '@' + CAM_IP +
+    '/axis-cgi/com/ptz.cgi?rpan=' + newPosition.x +
+    '&rtilt=' + newPosition.y,
+    function() {
+      console.log('Camera moved.');
+      deferred.resolve();
+    }).on('error', function(e) {
+    console.log("Got error: " + e.message);
+    deferred.reject();
+  });
+  return deferred.promise;
+};
+
+var moveCamera = function(newPosition) {
+  var deferred = Q.defer();
+  http.get('http://' + CAM_CREDENTIALS + '@' + CAM_IP +
+    '/axis-cgi/com/ptz.cgi?pan=' + newPosition.x +
+    '&tilt=' + newPosition.y,
+    function() {
+      console.log('Camera moved.');
+      deferred.resolve();
+    }).on('error', function(e) {
+    console.log("Got error: " + e.message);
+    deferred.reject();
+  });
+  return deferred.promise;
+};
+
+var schedulePositionReset = function() {
+  console.log('Camera position reset scheduled.');
+  if (schedulePositionResetId) {
+    clearTimeout(schedulePositionResetId);
+  }
+  schedulePositionResetId = setTimeout(function() {
+    moveCamera(CAM_START_POS).then(function() {
+      console.log('Camera position reset!');
+    });
+  }, 60000);
+};
+
 app.get('/', function(req, res) {
   var now = (new Date()).getTime();
   if (!lastMotionTime || lastMotionTime + MOVE_WAIT < now) {
@@ -35,14 +81,10 @@ app.get('/', function(req, res) {
     var newPosition = extractPosition(req);
     console.log('New position: ' + JSON.stringify(newPosition));
     if (newPosition) {
-      http.get('http://' + CAM_CREDENTIALS + '@' + CAM_IP +
-        '/axis-cgi/com/ptz.cgi?rpan=' + newPosition.x +
-        '&rtilt=' + newPosition.y,
-        function() {
-          console.log('Camera moved.');
-          return res.status(200).send('Camera moved.');
-        }).on('error', function(e) {
-        console.log("Got error: " + e.message);
+      schedulePositionReset();
+      moveCameraRelative(newPosition).then(function() {
+        return res.status(200).send('Camera moved.');
+      }, function() {
         return res.status(500);
       });
     } else {
@@ -56,6 +98,9 @@ app.get('/', function(req, res) {
 });
 
 var server = app.listen(3000, function() {
+  moveCamera(CAM_START_POS).then(function() {
+    console.log('Camera position reset!');
+  });
   var port = server.address().port;
   console.log('Server listening at http://127.0.0.1:%s', port);
   return;
