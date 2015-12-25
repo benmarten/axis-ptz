@@ -4,13 +4,13 @@ var express = require('express');
 var app = express();
 var http = require('http');
 
-var MOVE_WAIT = process.env.MOVE_WAIT || 10000;
+var MOVE_WAIT = parseInt(process.env.MOVE_WAIT) || 10000;
 var CAM_IP = '192.168.178.54';
 var CAM_CREDENTIALS = 'root:shIt7Bu8';
 var CAM_RES_W = 704;
 var CAM_RES_H = 576;
-var CAM_FACTOR_X = process.env.CAM_FACTOR || 10;
-var CAM_FACTOR_Y = process.env.CAM_FACTOR || 12;
+var CAM_FACTOR_X = parseInt(process.env.CAM_FACTOR) || 10;
+var CAM_FACTOR_Y = parseInt(process.env.CAM_FACTOR) || 12;
 
 var lastMotionTime;
 
