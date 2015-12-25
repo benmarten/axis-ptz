@@ -33,7 +33,8 @@ app.get('/', function(req, res) {
     console.log('New position: ' + JSON.stringify(newPosition));
     if (newPosition) {
       http.get('http://' + CAM_CREDENTIALS + '@' + CAM_IP +
-        '/axis-cgi/com/ptz.cgi?rpan=' + newPosition.x,
+        '/axis-cgi/com/ptz.cgi?rpan=' + newPosition.x +
+        '&rtilt=' + newPosition.y,
         function() {
           console.log('Camera moved.');
           return res.status(200).send('Camera moved.');
