@@ -9,7 +9,8 @@ var CAM_IP = '192.168.178.54';
 var CAM_CREDENTIALS = 'root:shIt7Bu8';
 var CAM_RES_W = 704;
 var CAM_RES_H = 576;
-var CAM_FACTOR = process.env.CAM_FACTOR || 10;
+var CAM_FACTOR_X = process.env.CAM_FACTOR || 10;
+var CAM_FACTOR_Y = process.env.CAM_FACTOR || 10;
 
 var lastMotionTime;
 
@@ -19,8 +20,8 @@ var extractPosition = function(req) {
     return;
   }
   return {
-    x: Math.round(-(CAM_RES_W / 2 - req.query.x) / CAM_FACTOR),
-    y: Math.round(-(CAM_RES_H / 2 - req.query.y) / CAM_FACTOR)
+    x: Math.round(-(CAM_RES_W / 2 - req.query.x) / CAM_FACTOR_X),
+    y: Math.round(-(CAM_RES_H / 2 - req.query.y) / CAM_FACTOR_Y)
   };
 };
 
