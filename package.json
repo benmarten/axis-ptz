@@ -1,0 +1,16 @@
+{
+  "name": "axis",
+  "version": "0.0.0",
+  "description": "",
+  "main": "axis.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
