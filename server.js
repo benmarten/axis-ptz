@@ -11,6 +11,7 @@ var CAMERA_CREDENTIALS = 'root:shIt7Bu8';
 var lastMotionTime;
 
 var extractPosition = function(req) {
+  console.log('Query Params: ' + req.query);
   if (!req.query || !req.query.x || !req.query.y) {
     return;
   }
