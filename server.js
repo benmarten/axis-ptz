@@ -17,7 +17,7 @@ var CAM_START_POS = {
   y: -30
 };
 
-var lastMotionTime;
+var lastMotionTime = (new Date()).getTime() + 5000;
 var schedulePositionResetId;
 
 var extractPosition = function(req) {
@@ -67,7 +67,7 @@ var schedulePositionReset = function() {
     clearTimeout(schedulePositionResetId);
   }
   schedulePositionResetId = setTimeout(function() {
-    lastMotionTime = (new Date()).getTime();
+    lastMotionTime = (new Date()).getTime() + 5000;
     moveCamera(CAM_START_POS).then(function() {
       console.log('Camera position reset!');
     });
@@ -76,7 +76,7 @@ var schedulePositionReset = function() {
 
 app.get('/', function(req, res) {
   var now = (new Date()).getTime();
-  if (!lastMotionTime || lastMotionTime + MOVE_WAIT < now) {
+  if (lastMotionTime + MOVE_WAIT < now) {
     lastMotionTime = now;
 
     var newPosition = extractPosition(req);
