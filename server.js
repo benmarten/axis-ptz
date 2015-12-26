@@ -67,8 +67,7 @@ var schedulePositionReset = function() {
     clearTimeout(schedulePositionResetId);
   }
   schedulePositionResetId = setTimeout(function() {
-    var now = (new Date()).getTime();
-    lastMotionTime = now;
+    lastMotionTime = (new Date()).getTime();
     moveCamera(CAM_START_POS).then(function() {
       console.log('Camera position reset!');
     });
@@ -94,7 +93,6 @@ app.get('/', function(req, res) {
       return res.status(500).send('New position missing.');
     }
   } else {
-    console.log('Skipping request.');
     return res.status(200).send('Skipping request.');
   }
 });
