@@ -13,8 +13,8 @@ var CAM_RES_H = 576;
 var CAM_FACTOR_X = parseInt(process.env.CAM_FACTOR) || 10;
 var CAM_FACTOR_Y = parseInt(process.env.CAM_FACTOR) || 12;
 var CAM_START_POS = {
-  x: 50,
-  y: -30
+  x: parseInt(process.env.CAM_FACTOR) || -97,
+  y: parseInt(process.env.CAM_FACTOR) || -27
 };
 
 var lastMotionTime = (new Date()).getTime() + 5000;
